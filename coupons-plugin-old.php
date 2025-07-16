@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Find Coupon From Spreadsheet (WAF対応)
  * Description:       GAS連携でクーポン情報を更新してショートコードで表示するプラグイン
- * Version:           1.2
+ * Version:           1.1
  * Author:            hiroki
  */
 if ( ! defined( 'ABSPATH' ) ) {
@@ -160,28 +160,16 @@ add_action('wp_head', function() {
         display: flex;
         width: 100%;
         position: relative;
-        max-height: 80vh;
-        overflow-y: auto;
     }
     
     .fixed-columns {
         flex-shrink: 0;
-        max-height: 80vh;
-        overflow-y: auto;
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* Internet Explorer 10+ */
-    }
-    
-    .fixed-columns::-webkit-scrollbar {
-        display: none; /* WebKit */
     }
     
     .scrollable-columns {
         overflow-x: auto;
         flex-grow: 1;
         position: relative;
-        max-height: 80vh;
-        overflow-y: auto;
     }
     
     .scrollable-columns table {
@@ -330,8 +318,6 @@ add_action('wp_head', function() {
             width: 100%;
             overflow-x: auto;
             position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
         }
         
         .mobile-scroll-indicator-fixed {
@@ -572,11 +558,10 @@ add_shortcode('coupon_table', function() {
     });
   }
   
-  // スクロールインジケーターの制御とスクロール同期
+  // スクロールインジケーターの制御
   document.addEventListener("DOMContentLoaded", function() {
     const scrollArea = document.getElementById("scrollable-area");
     const indicator = document.getElementById("scroll-indicator");
-    const fixedColumns = document.querySelector(".fixed-columns");
     
     if (scrollArea && indicator) {
       function updateIndicator() {
@@ -590,29 +575,11 @@ add_shortcode('coupon_table', function() {
         }
       }
       
-      // 縦スクロールの同期
-      function syncVerticalScroll() {
-        if (fixedColumns && scrollArea) {
-          // 固定列とスクロール列の縦スクロールを同期
-          fixedColumns.scrollTop = scrollArea.scrollTop;
-        }
-      }
-      
       // 初期状態をチェック
       updateIndicator();
       
-      // スクロール時に更新と同期
-      scrollArea.addEventListener("scroll", function() {
-        updateIndicator();
-        syncVerticalScroll();
-      });
-      
-      // 固定列がスクロールされた場合もスクロール列と同期
-      if (fixedColumns) {
-        fixedColumns.addEventListener("scroll", function() {
-          scrollArea.scrollTop = fixedColumns.scrollTop;
-        });
-      }
+      // スクロール時に更新
+      scrollArea.addEventListener("scroll", updateIndicator);
       
       // リサイズ時に更新
       window.addEventListener("resize", updateIndicator);
